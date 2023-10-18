@@ -1,4 +1,5 @@
 import express from "express";
+import AuthController from "../controllers/AuthController.js";
 
 const router = express.Router();
 
@@ -13,5 +14,7 @@ router.post("/", (req, res) => {
   console.log(req.body);
   console.log(req);
 });
+
+router.post("/register", AuthController.register);
 
 export default router;
