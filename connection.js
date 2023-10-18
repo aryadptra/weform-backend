@@ -1,9 +1,12 @@
+import dotenv from "dotenv";
 import mongoose from "mongoose";
+
+const env = dotenv.config().parsed;
 
 const connection = () => {
   // connection to mongodb server
-  mongoose.connect("mongodb://localhost:27017", {
-    dbName: "weform",
+  mongoose.connect(env.MONGODB_URI, {
+    dbName: env.MONGODB_NAME,
   });
 
   // create a new constanta
@@ -15,7 +18,9 @@ const connection = () => {
   });
 
   connection.on("open", () => {
-    console.log("Mongoodb successfully connected");
+    console.log(
+      `Mongoodb successfully connected to ${env.MONGODB_NAME} database`
+    );
   });
 };
 

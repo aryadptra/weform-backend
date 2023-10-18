@@ -1,6 +1,9 @@
+import dotenv from "dotenv";
 import express from "express";
 import apiRouter from "./routes/api.js";
 import connection from "./connection.js";
+
+const env = dotenv.config().parsed;
 
 const app = express();
 
@@ -14,6 +17,6 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", apiRouter);
 
-app.listen(3000, () => {
+app.listen(env.APP_PORT, () => {
   console.log("Server listening on port 3000");
 });
