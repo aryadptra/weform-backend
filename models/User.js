@@ -9,6 +9,7 @@ const Schemas = new mongoose.Schema(
     email: {
       type: String,
       required: true,
+      uniqe: true,
     },
     password: {
       type: String,
