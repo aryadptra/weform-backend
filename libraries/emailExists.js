@@ -1,10 +1,14 @@
-import User from "../models/User.js";
+import user from "../models/User.js";
 const emailExist = async (email) => {
-  const user = await User.findOne({ email: email });
-  if (user) {
+  try {
+    const User = await user.findOne({ email: email });
+    if (!User) {
+      return false;
+    }
     return true;
+  } catch (err) {
+    return false;
   }
-  return false;
 };
 
 export default emailExist;
