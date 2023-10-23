@@ -1,5 +1,6 @@
 import express from "express";
 import AuthController from "../controllers/AuthController.js";
+import jwtAuth from "../libraries/jwtAuth.js";
 
 const router = express.Router();
 
@@ -16,6 +17,6 @@ router.post("/", (req, res) => {
 
 router.post("/register", AuthController.register);
 router.post("/login", AuthController.login);
-router.post("/refresh-token", AuthController.refreshToken);
+router.post("/refresh-token", jwtAuth(), AuthController.refreshToken);
 
 export default router;

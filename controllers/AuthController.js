@@ -150,7 +150,7 @@ class AuthController {
       // verify refresh token
       const verify = await jsonwebtoken.verify(
         req.body.refreshToken,
-        env.JWT_ACCESS_SECRET_KEY
+        env.JWT_REFRESH_SECRET_KEY
       );
 
       // create payload, id: user.id
