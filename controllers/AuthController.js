@@ -1,7 +1,40 @@
+import dotenv from "dotenv";
 import User from "../models/User.js";
 import emailExist from "../libraries/emailExists.js";
 import bcrypt from "bcrypt";
 import jsonwebtoken from "jsonwebtoken";
+
+const env = dotenv.config().parsed;
+
+/**
+ *
+ * @param payload
+ * function to generate access token and refresh token
+ * @returns
+ */
+const generateAccessToken = async (payload) => {
+  return jsonwebtoken.sign(
+    {
+      payload,
+    },
+    env.JWT_ACCESS_SECRET_KEY,
+    {
+      expiresIn: env.JWT_ACCESS_EXPIRATION_TIME,
+    }
+  );
+};
+
+const generateRefreshToken = async (payload) => {
+  return jsonwebtoken.sign(
+    {
+      payload,
+    },
+    env.JWT_REFRESH_SECRET_KEY,
+    {
+      expiresIn: env.JWT_REFRESH_EXPIRATION_TIME,
+    }
+  );
+};
 class AuthController {
   async register(req, res) {
     try {
@@ -86,27 +119,12 @@ class AuthController {
         };
       }
 
-      const accessToken = await jsonwebtoken.sign(
-        {
-          id: user.id,
-        },
+      // create payload, id: user.id
+      // you can change other payloads here
+      let payload = { id: user.id };
+      const refreshToken = await generateRefreshToken(payload);
+      const accessToken = await generateAccessToken(payload);
 
-        "00127aryadwiputra721000",
-        {
-          expiresIn: "15m",
-        }
-      );
-
-      const refreshToken = await jsonwebtoken.sign(
-        {
-          id: user.id,
-        },
-
-        "317101270100000000002135",
-        {
-          expiresIn: "1h",
-        }
-      );
       return res.status(200).json({
         status: true,
         message: "LOGIN_SUCCESS",
@@ -117,6 +135,58 @@ class AuthController {
       return res
         .status(err.code || 500)
         .json({ status: false, message: err.message });
+    }
+  }
+
+  async refreshToken(req, res) {
+    try {
+      if (!req.body.refreshToken) {
+        throw {
+          code: 428,
+          message: "REFRESH_TOKEN_IS_REQUIRED",
+        };
+      }
+
+      // verify refresh token
+      const verify = await jsonwebtoken.verify(
+        req.body.refreshToken,
+        env.JWT_ACCESS_SECRET_KEY
+      );
+
+      // create payload, id: user.id
+      // you can change other payloads here
+      let payload = { id: verify.id };
+      const accessToken = await generateAccessToken(payload);
+      const refreshToken = await generateRefreshToken(payload);
+
+      return res.status(200).json({
+        status: true,
+        message: "REFRESH_TOKEN_IS_SUCCESSFUL",
+        accessToken,
+        refreshToken,
+      });
+    } catch (err) {
+      // create error message using array
+      const errorJwt = [
+        "invalid signature",
+        "jwt mailformed",
+        "jwt must be provided",
+        "invalid token",
+      ];
+
+      if (err.message == "jwt expired") {
+        err.message = "REFRESH_TOKEN_EXPIRED";
+
+        // if error message includes on array
+      } else if (errorJwt.includes(err.message)) {
+        {
+          err.message = "INVALID_REFRESH_TOKEN";
+        }
+        return res.status(err.code || 500).json({
+          status: false,
+          message: err.message,
+        });
+      }
     }
   }
 }
