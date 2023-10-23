@@ -13,6 +13,9 @@ class AuthController {
       if (!req.body.password) {
         throw { code: 400, message: "PASSWORD_IS_REQUIRED" };
       }
+      if (req.body.password.length < 6) {
+        throw { code: 400, message: "PASSWORD_MINIMUM_6_CHARACTERS" };
+      }
 
       const emailValidation = emailExist(req.body.email);
       if (emailValidation) {
