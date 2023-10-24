@@ -1,11 +1,10 @@
-import mongoose from "mongoose";
 import Form from "../models/Form.js";
 
 class FormController {
   async store(req, res) {
     try {
       const form = await Form.create({
-        user_id: req.jwt.id,
+        userId: req.jwt.payload.id,
         title: "Untitled Form",
         description: null,
         public: true,
@@ -24,10 +23,13 @@ class FormController {
         form,
       });
     } catch (err) {
-      return res.status(error.code || 500).json({
+      return res.status(err.code || 500).json({
         status: false,
         message: err.message,
       });
+      console.error(err);
     }
   }
 }
+
+export default new FormController();
