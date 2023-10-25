@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Form from "../models/Form.js";
 
 class FormController {
@@ -28,6 +29,51 @@ class FormController {
         message: err.message,
       });
       console.error(err);
+    }
+  }
+
+  async show(req, res) {
+    try {
+      // Validation request
+      if (!req.params.id) {
+        throw {
+          code: 428,
+          message: "ID_FORM_REQUIRED",
+        };
+      }
+
+      // Validation data form request
+      if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        throw {
+          code: 428,
+          message: "INVALID_ID_FORM",
+        };
+      }
+
+      // Find data from request using _id and userId
+      const form = await Form.findOne({
+        _id: req.params.id,
+        userId: req.jwt.payload.id,
+      });
+
+      //
+      if (!form) {
+        throw {
+          code: 404,
+          message: "FORM_NOT_FOUND",
+        };
+      }
+
+      return res.status(200).json({
+        status: true,
+        message: "FORM_FOUND",
+        form,
+      });
+    } catch (err) {
+      return res.status(err.code || 500).json({
+        status: false,
+        message: err.message,
+      });
     }
   }
 }
