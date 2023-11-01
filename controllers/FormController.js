@@ -76,6 +76,50 @@ class FormController {
       });
     }
   }
+
+  async update(req, res) {
+    try {
+      // Validation request
+      if (!req.params.id) {
+        throw {
+          code: 428,
+          message: "ID_FORM_REQUIRED",
+        };
+      }
+
+      // Validation data form request
+      if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        throw {
+          code: 428,
+          message: "INVALID_ID_FORM",
+        };
+      }
+
+      const form = await Form.findOneAndUpdate(
+        {
+          _id: req.params.id,
+          userId: req.jwt.payload.id,
+        },
+        req.body,
+        { new: true }
+      );
+
+      if (!form) {
+        throw { code: 404, message: "FORM_UPDATE_FAILED" };
+      }
+
+      return res.status(200).json({
+        status: true,
+        message: "FORM_SUCESS_UPDATED",
+        form,
+      });
+    } catch (err) {
+      return res.status(err.code || 500).json({
+        status: false,
+        message: err.message,
+      });
+    }
+  }
 }
 
 export default new FormController();

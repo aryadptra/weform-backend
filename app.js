@@ -18,5 +18,5 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api", apiRouter);
 
 app.listen(env.APP_PORT, () => {
-  console.log("Server listening on port 3000");
+  console.log(`Server listening on port ${env.APP_PORT}`);
 });
