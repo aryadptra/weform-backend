@@ -2,6 +2,28 @@ import mongoose from "mongoose";
 import Form from "../models/Form.js";
 
 class FormController {
+  async index(req, res) {
+    try {
+      const form = await Form.find({
+        userId: req.jwt.payload.id,
+      });
+      if (!form) {
+        throw { code: 404, nessage: "FORM_NOT_FOUND" };
+      }
+      return res.status(200).json({
+        status: true,
+        message: "FORM_FOUND",
+        total: form.length,
+        form,
+      });
+    } catch (error) {
+      return res.status(err.code || 500).json({
+        status: false,
+        message: err.message,
+      });
+    }
+  }
+
   async store(req, res) {
     try {
       const form = await Form.create({
@@ -28,7 +50,6 @@ class FormController {
         status: false,
         message: err.message,
       });
-      console.error(err);
     }
   }
 

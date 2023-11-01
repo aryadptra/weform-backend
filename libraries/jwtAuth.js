@@ -34,17 +34,14 @@ const jwtAuth = () => {
 
       if (err.message == "jwt expired") {
         err.message = "REFRESH_TOKEN_EXPIRED";
-
-        // if error message includes on array
       } else if (errorJwt.includes(err.message)) {
-        {
-          err.message = "INVALID_REFRESH_TOKEN";
-        }
-        return res.status(err.code || 500).json({
-          status: false,
-          message: err.message,
-        });
+        err.message = "INVALID_REFRESH_TOKEN";
       }
+
+      return res.status(err.code || 500).json({
+        status: false,
+        message: err.message,
+      });
     }
   };
 };

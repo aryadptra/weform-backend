@@ -20,6 +20,7 @@ router.post("/register", AuthController.register);
 router.post("/login", AuthController.login);
 router.post("/refresh-token", jwtAuth(), AuthController.refreshToken);
 
+router.get("/forms", jwtAuth(), FormController.index);
 router.post("/forms", jwtAuth(), FormController.store);
 router.get("/forms/:id", jwtAuth(), FormController.show);
 router.put("/forms/:id", jwtAuth(), FormController.update);
