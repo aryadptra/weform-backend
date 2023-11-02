@@ -1,4 +1,5 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
+import mongoosePaginate from "mongoose-paginate-v2";
 
 const Schemas = new mongoose.Schema(
   {
@@ -24,5 +25,7 @@ const Schemas = new mongoose.Schema(
     },
   }
 );
+
+Schemas.plugin(mongoosePaginate);
 
 export default mongoose.model("Form", Schemas);
