@@ -4,7 +4,9 @@
   "description": "Backend for weform",
   "main": "app.js",
   "type": "module",
-  "scripts": {},
+  "scripts": {
+    "dev": "nodemon app.js"
+  },
   "author": "Arya Dwi Putra",
   "license": "ISC",
   "dependencies": {
