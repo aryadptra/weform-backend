@@ -4,6 +4,31 @@ import Form from "../models/Form.js";
 const allowedTypes = ["Text", "Email", "Radio", "Checkbox", "Dropdown"];
 
 class QuestionController {
+  async index(req, res) {
+    try {
+      const form = await Form.findOne({ _id: req.params.id }).select(
+        "questions"
+      );
+      if (!form) {
+        throw { code: 404, message: "QUESTION_NOT_FOUND" };
+      }
+
+      res.status(200).json({
+        status: true,
+        form,
+      });
+    } catch (err) {
+      if (!err.code) {
+        err.code = 500;
+      }
+      res.status(err.code).json({
+        status: false,
+        message: err.message,
+        index: err.index,
+      });
+    }
+  }
+
   async store(req, res) {
     try {
       if (!req.params.id) {
@@ -122,6 +147,41 @@ class QuestionController {
       });
     } catch (err) {
       return res.status(err.code || 500).json({
+        status: false,
+        message: err.message,
+      });
+    }
+  }
+
+  async destroy(req, res) {
+    try {
+      const question = await Form.findOneAndUpdate(
+        { _id: req.params.id, userId: req.jwt.payload.id },
+        {
+          $pull: {
+            questions: {
+              id: new mongoose.Types.ObjectId(req.params.questionId),
+            },
+          },
+        },
+        {
+          new: true,
+        }
+      );
+      if (!question) {
+        throw { code: 500, message: "DELETE_QUESTION_FAILED" };
+      }
+
+      res.status(200).json({
+        status: true,
+        message: "DELETE_QUESTION_SUCCESS",
+        question,
+      });
+    } catch (err) {
+      if (!err.code) {
+        err.code = 500;
+      }
+      res.status(err.code).json({
         status: false,
         message: err.message,
       });
