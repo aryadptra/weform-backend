@@ -224,6 +224,157 @@ class OptionController {
         option: { id: req.params.optionId, value: req.body.option },
       });
     } catch (err) {
+      res.status(err.code || 500).json({
+        status: false,
+        message: err.message,
+      });
+    }
+  }
+
+  // async destroy(req, res) {
+  //   try {
+  //     // Check form id
+  //     if (!req.params.id) {
+  //       throw { code: 428, message: "FORM_ID_REQUIRED" };
+  //     }
+  //     if (!req.params.questionId) {
+  //       throw { code: 428, message: "QUESTION_ID_REQUIRED" };
+  //     }
+  //     if (!req.params.optionId) {
+  //       throw { code: 428, message: "OPTION_ID_REQUIRED" };
+  //     }
+  //     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+  //       throw { code: 400, message: "INVALID_ID" };
+  //     }
+  //     if (!mongoose.Types.ObjectId.isValid(req.params.questionId)) {
+  //       throw { code: 428, message: "INVALID_QUESTION_ID" };
+  //     }
+  //     if (!mongoose.Types.ObjectId.isValid(req.params.optionId)) {
+  //       throw { code: 400, message: "INVALID_OPTION_ID" };
+  //     }
+
+  //     // Find the form
+  //     const form = await Form.findOne({
+  //       _id: req.params.id,
+  //       userId: req.jwt.payload.id,
+  //     });
+
+  //     if (!form) {
+  //       throw {
+  //         code: 400,
+  //         message: "FORM_NOT_FOUND",
+  //       };
+  //     }
+
+  //     // Find the question and option to update
+  //     const questionIndex = form.questions.findIndex(
+  //       (question) => question.id.toString() === req.params.questionId
+  //     );
+
+  //     if (questionIndex === -1) {
+  //       throw {
+  //         code: 400,
+  //         message: "QUESTION_NOT_FOUND",
+  //       };
+  //     }
+
+  //     const optionIndex = form.questions[questionIndex].options.findIndex(
+  //       (option) => option.id.toString() === req.params.optionId
+  //     );
+
+  //     if (optionIndex === -1) {
+  //       throw {
+  //         code: 400,
+  //         message: "OPTION_NOT_FOUND",
+  //       };
+  //     }
+
+  //     // Update the option value
+
+  //     const removeFields = {
+  //       $pull: {
+  //         optionIndex: {
+  //           id: new mongoose.Types.ObjectId(req.params.optionId),
+  //         },
+  //       },
+  //     };
+
+  //     await Form.findOneAndUpdate(
+  //       {
+  //         _id: req.params.id,
+  //         userId: req.jwt.payload.id,
+  //       },
+  //       removeFields,
+  //       { new: true }
+  //     );
+
+  //     res.status(200).json({
+  //       status: true,
+  //       message: "SUCCESS_DELETED_OPTION",
+  //       form,
+  //     });
+  //   } catch (err) {
+  //     console.log(err);
+  //     res.status(err.code || 500).json({
+  //       status: false,
+  //       message: err.message,
+  //     });
+  //   }
+  // }
+
+  async destroy(req, res) {
+    try {
+      //check form id
+      if (!req.params.id) {
+        throw { code: 428, message: "FORM_ID_REQUIRED" };
+      }
+      if (!req.params.questionId) {
+        throw { code: 428, message: "QUESTION_ID_REQUIRED" };
+      }
+      if (!req.params.optionId) {
+        throw { code: 428, message: "OPTION_ID_REQUIRED" };
+      }
+      if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        throw { code: 400, message: "INVALID_ID" };
+      }
+      if (!mongoose.Types.ObjectId.isValid(req.params.questionId)) {
+        throw { code: 428, message: "INVALID_QUESTION_ID" };
+      }
+      if (!mongoose.Types.ObjectId.isValid(req.params.optionId)) {
+        throw { code: 400, message: "OPTION_ID_REQUIRED" };
+      }
+
+      const question = await Form.findOneAndUpdate(
+        { _id: req.params.id, userId: req.jwt.payload.id },
+        {
+          $pull: {
+            "questions.$[indexQuestion].options": {
+              id: new mongoose.Types.ObjectId(req.params.optionId),
+            },
+          },
+        },
+        {
+          arrayFilters: [
+            {
+              "indexQuestion.id": new mongoose.Types.ObjectId(
+                req.params.questionId
+              ),
+            },
+          ],
+          new: true,
+        }
+      );
+
+      if (!question) {
+        throw { code: 500, message: "DELETE_OPTIONS_FAILED" };
+      }
+
+      res.status(200).json({
+        status: true,
+        message: "DELETE_OPTIONS_SUCCESS",
+        question,
+      });
+    } catch (err) {
       console.log(err);
       res.status(err.code || 500).json({
         status: false,

@@ -57,6 +57,10 @@ router.put(
   jwtAuth(),
   OptionController.update
 );
-// router.delete("/forms/:id", jwtAuth(), OptionController.destroy);
+router.delete(
+  "/forms/:id/questions/:questionId/options/:optionId",
+  jwtAuth(),
+  OptionController.destroy
+);
 
 export default router;
