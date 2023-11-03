@@ -52,7 +52,11 @@ router.post(
   OptionController.store
 );
 // router.get("/forms/:id", jwtAuth(), OptionController.show);
-// router.put("/forms/:id", jwtAuth(), OptionController.update);
+router.put(
+  "/forms/:id/questions/:questionId/options/:optionId",
+  jwtAuth(),
+  OptionController.update
+);
 // router.delete("/forms/:id", jwtAuth(), OptionController.destroy);
 
 export default router;
