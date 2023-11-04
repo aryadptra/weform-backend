@@ -11,10 +11,10 @@ const Schemas = new mongoose.Schema(
       required: true,
     },
     createdAt: {
-      type: number,
+      type: Number,
     },
     updatedAt: {
-      type: number,
+      type: Number,
     },
   },
   {
